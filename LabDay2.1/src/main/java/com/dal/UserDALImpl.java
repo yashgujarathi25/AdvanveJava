@@ -11,12 +11,13 @@ import com.util.DBUtils;
 public class UserDALImpl implements UserDAL{
 	
 	private Connection con;
-	private PreparedStatement pstmt,pstmt1;
+	private PreparedStatement pstmt,pstmt1,pstmt2;
 	private ResultSet rset;
 	public UserDALImpl() throws SQLException {
 		con=DBUtils.getCon();
 		pstmt=con.prepareStatement("select * from users where email =? and password =?");
 		pstmt1=con.prepareStatement("insert into users(custName, city,email,password) values(?,?,?,?)");
+		pstmt2 = con.prepareStatement("update users set custName=?,city=?,email=?,password=? where userid=?");
 	}
 		
 	@Override
@@ -45,4 +46,19 @@ public class UserDALImpl implements UserDAL{
 		return i;
 	}
 
+	@Override
+	public int updateUser(int id,String name, String city, String email, String password) throws SQLException {
+		
+		pstmt2.setString(1, name);
+		pstmt2.setString(2, city);
+		pstmt2.setString(3, email);
+		pstmt2.setString(4, password);
+		pstmt2.setInt(5, id);
+		
+		int i = pstmt2.executeUpdate();
+		
+		return i;
+	}
+
+	
 }

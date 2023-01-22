@@ -10,15 +10,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.dal.UserDALImpl;
+import com.pojo.User;
 import com.util.DBUtils;
 
 /**
- * Servlet implementation class AddServlet
+ * Servlet implementation class UpdateAction
  */
-@WebServlet("/addServlet")
-public class AddServlet extends HttpServlet {
+@WebServlet("/updateAction")
+public class UpdateAction extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	UserDALImpl userDao;
@@ -33,13 +35,10 @@ public class AddServlet extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
-	/**
-	 * @see Servlet#destroy()
-	 */
 	public void destroy() {
-
 		try {
 			DBUtils.closeConnection();
 		} catch (SQLException e) {
@@ -48,28 +47,27 @@ public class AddServlet extends HttpServlet {
 		}
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter pw= response.getWriter();
-		response.setContentType("text/html");
-		String name = request.getParameter("txtname");
-		String city = request.getParameter("txtcity");
-		String email = request.getParameter("txtemail");
-		String pass = request.getParameter("txtpass");
-		
-		try {
-			int i = userDao.adduser(name, city, email, pass);
+		try(PrintWriter pw = response.getWriter()) {
 			
+			HttpSession hs = request.getSession();
+			User userObj = (User)hs.getAttribute("userinfo");
+			System.out.println("Sesssion Id = " + hs.getId());
+			String name = request.getParameter("txtnm");
+			String city = request.getParameter("txtcity");
+			String email = request.getParameter("txtemail");
+			String pass = request.getParameter("txtpass");
+			int i = userDao.updateUser(userObj.getUserid(), name, city, email, pass);
 			if(i>0) {
-				response.sendRedirect("login.html");
+				
+				response.sendRedirect("welcome");
+			}else {
+				pw.write("<h3>Updation Fail</h3>");
 			}
-			else {
-				pw.write("<h2>Unsuccessfull Registration..!!!</h2>");
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			
+			
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

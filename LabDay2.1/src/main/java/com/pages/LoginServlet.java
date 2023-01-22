@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.dal.UserDALImpl;
 import com.pojo.User;
@@ -76,10 +77,16 @@ public class LoginServlet extends HttpServlet {
 			
 			User obj = userDao.validateLogin(email, password);
 			if(obj!=null) {
-			pw.write("<h1>"+obj+"</h1>");
+				//pw.write("<h1>"+obj+"</h1>");
+				HttpSession hs = request.getSession();
+				hs.setAttribute("userinfo", obj);
+				System.out.println("Session Created with Id : " +hs.getId());
+				System.out.println("Session Created on : " +hs.getCreationTime());
+				
+				response.sendRedirect("welcome");
 			}
 			else {
-				pw.write("<h1>Invalid User</h1>");
+				response.sendRedirect("login.html");
 			}
 			
 		} catch (SQLException e) {
